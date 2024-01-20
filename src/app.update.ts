@@ -32,7 +32,7 @@ export class AppUpdate {
     await ctx.reply(showList(todos));
   }
 
-  @Hears('🗒 Create a new task')
+  @Hears('✏ Create a new task')
   async createNewTask(ctx: IContext) {
     ctx.session.type = 'create';
     await ctx.reply('Describe the task: ');
