@@ -3,7 +3,7 @@ import { AppUpdate } from './app.update';
 import { AppService } from './app.service';
 import { TelegrafModule } from 'nestjs-telegraf';
 import * as LocalSession from 'telegraf-session-local';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import configurations from './configurations';
 
 const sessions = new LocalSession({ database: 'session_db.json' });
@@ -11,9 +11,17 @@ const sessions = new LocalSession({ database: 'session_db.json' });
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configurations] }),
-    TelegrafModule.forRoot({
-      middlewares: [sessions.middleware()],
-      token: ''
+    // TelegrafModule.forRoot({
+    //   middlewares: [sessions.middleware()],
+    //   token: ''
+    // }),
+    TelegrafModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        middlewares: [sessions.middleware()],
+        token: configService.get<string>('tg_token')
+      })
     })
   ],
   controllers: [],
