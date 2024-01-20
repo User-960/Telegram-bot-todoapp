@@ -1,4 +1,2 @@
-import { ITodo } from 'src/interfaces/todo.interface';
-
-export const showList = (todos: ITodo[]) =>
+export const showList = (todos) =>
   `Your to-do list: \n\n${todos.map((todo) => (todo.isCompleted ? '✅' : '◻') + ' ' + todo.name + '\n\n').join('')}`;

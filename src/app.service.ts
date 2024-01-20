@@ -1,8 +1,58 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TaskEntity } from './entities/task.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  constructor(
+    @InjectRepository(TaskEntity)
+    private readonly taskRepository: Repository<TaskEntity>
+  ) {}
+
+  async getAll() {
+    return this.taskRepository.find();
+  }
+
+  async getById(id: number) {
+    return this.taskRepository.findOneBy({ id });
+  }
+
+  async createNewTask(name: string) {
+    const task = await this.taskRepository.create({ name });
+
+    if (!task) return null;
+
+    await this.taskRepository.save(task);
+    return this.getAll();
+  }
+
+  async completeTask(id: number) {
+    const task = await this.getById(id);
+
+    if (!task) return null;
+
+    task.isCompleted = !task.isCompleted;
+    await this.taskRepository.save(task);
+    return this.getAll();
+  }
+
+  async editTask(id: number, newName: string) {
+    const task = await this.getById(id);
+
+    if (!task) return null;
+
+    task.name = newName;
+    await this.taskRepository.save(task);
+    return this.getAll();
+  }
+
+  async deleteTask(id: number) {
+    const task = await this.getById(id);
+
+    if (!task) return null;
+
+    await this.taskRepository.delete({ id });
+    return this.getAll();
   }
 }
